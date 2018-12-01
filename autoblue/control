@@ -1,0 +1,9 @@
+Package: com.karimo299.autoublue
+Name: AutoBlue
+Depends: mobilesubstrate, PreferenceLoader, ws.hbang.common
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Disables Bluetooth after a specific ammount of time if there aren't any devices connected devices
+Maintainer: Karimo299
+Author: Karimo299
+Section: Tweaks
