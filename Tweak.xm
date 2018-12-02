@@ -55,7 +55,7 @@ static void loadPrefs() {
 
 - (void) setPowered:(BOOL)arg1 {
 	%orig;
-	[NSTimer scheduledTimerWithTimeInterval:10
+	[NSTimer scheduledTimerWithTimeInterval:timer
     	target:self
 			selector:@selector(disable)
 			userInfo:nil
