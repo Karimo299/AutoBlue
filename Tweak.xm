@@ -11,6 +11,7 @@ static BluetoothManager *btMan;
 static BOOL enabled;
 static BOOL useTimer;
 static float timer;
+static BOOL waitingForTimer = NO;
 
 static void loadPrefs() {
 	CFStringRef APPID = CFSTR("com.karimo299.autoblue");
@@ -31,8 +32,9 @@ static void loadPrefs() {
 - (void)_connectedStatusChanged {
 	%orig;
 	loadPrefs();
-	if (enabled) {
+	if (enabled && !waitingForTimer) {
 		if (useTimer) {
+			waitingForTimer = YES;
 			[self performSelector:@selector(disable) withObject:nil afterDelay:timer];
 		} else {
 			[self disable];
@@ -42,6 +44,7 @@ static void loadPrefs() {
 
 %new
 - (void)disable {
+	waitingForTimer = NO;
 	if (![btMan connected]) {
 	[btMan setEnabled:0];
 	[btMan setPowered:0];
