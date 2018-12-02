@@ -1,10 +1,8 @@
 @class BluetoothManager;
 
 @interface BluetoothManager
-- (void)setEnabled:(BOOL)enabled;
-- (void)setPowered:(BOOL)powered;
-- (bool)enabled;
-- (bool)powered;
+- (void)setEnabled:(BOOL)arg1;
+- (void)setPowered:(BOOL)arg1;
 - (bool)connected;
 @end
 
@@ -53,5 +51,14 @@ static void loadPrefs() {
 	[btMan setEnabled:0];
 	[btMan setPowered:0];
 	}
+}
+
+- (void) setPowered:(BOOL)arg1 {
+	%orig;
+	[NSTimer scheduledTimerWithTimeInterval:10
+    	target:self
+			selector:@selector(disable)
+			userInfo:nil
+			repeats:NO];
 }
 %end
