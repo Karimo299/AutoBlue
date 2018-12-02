@@ -1,15 +1,16 @@
 @class BluetoothManager;
 
-@interface BluetoothManager
+@interface BluetoothManager : NSObject
 - (void)setEnabled:(BOOL)arg1;
 - (void)setPowered:(BOOL)arg1;
-- (bool)connected;
+- (BOOL)connected;
+- (void)disable;
 @end
 
 static BluetoothManager *btMan;
 static BOOL enabled;
 static BOOL useTimer;
-static int timer;
+static float timer;
 
 static void loadPrefs() {
 	CFStringRef APPID = CFSTR("com.karimo299.autoblue");
@@ -17,7 +18,8 @@ static void loadPrefs() {
 	NSDictionary *prefs = (NSDictionary *)CFPreferencesCopyMultiple((CFArrayRef)keyList, (CFStringRef)APPID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	enabled = [[prefs valueForKey:@"isEnabled"] boolValue];
 	useTimer = [[prefs valueForKey:@"useTimer"] boolValue];
-	timer = [[prefs valueForKey:@"timer"]intValue] * 60;
+	// timer = [[prefs valueForKey:@"timer"]floatValue] * 60;
+	timer = 10.0;
 }
 
 %hook BluetoothManager
@@ -31,16 +33,9 @@ static void loadPrefs() {
 	loadPrefs();
 	if (enabled) {
 		if (useTimer) {
-		[NSTimer scheduledTimerWithTimeInterval:timer
-    	target:self
-			selector:@selector(disable)
-			userInfo:nil
-			repeats:NO];
+			[self performSelector:@selector(disable) withObject:nil afterDelay:timer];
 		} else {
-			if (![btMan connected]) {
-				[btMan setEnabled:0];
-				[btMan setPowered:0];
-			}
+			[self disable];
 		}
 	}
 }
@@ -53,12 +48,11 @@ static void loadPrefs() {
 	}
 }
 
-- (void) setPowered:(BOOL)arg1 {
+- (void)setPowered:(BOOL)arg1 {
 	%orig;
-	[NSTimer scheduledTimerWithTimeInterval:timer
-    	target:self
-			selector:@selector(disable)
-			userInfo:nil
-			repeats:NO];
+	loadPrefs();
+	if (enabled) {
+		[self performSelector:@selector(disable) withObject:nil afterDelay:timer];
+	}
 }
 %end

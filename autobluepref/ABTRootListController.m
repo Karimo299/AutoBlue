@@ -24,6 +24,11 @@
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"https://twitter.com/karimo299"]];
 	}
 
+		//Twitter button
+	- (void) tweetPin {
+		[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"https://twitter.com/TPINPAL"]];
+	}
+
 	//Respring button
 	- (void) respring {
 		pid_t pid;

@@ -6,5 +6,6 @@
 @interface ABTRootListController : PSListController
 - (void) git;
 - (void) tweet;
+- (void) tweetPin;
 - (void) respring;
 @end
