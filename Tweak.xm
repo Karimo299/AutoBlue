@@ -31,7 +31,7 @@ static void loadPrefs() {
 - (void)_connectedStatusChanged {
 	%orig;
 	loadPrefs();
-	if (enabled) {
+	if (enabled && ![btMan connected] && [btMan enabled]) {
 		if (useTimer) {
 			[self performSelector:@selector(disable) withObject:nil afterDelay:timer];
 		} else {
@@ -42,9 +42,9 @@ static void loadPrefs() {
 
 %new
 - (void)disable {
-	if (![btMan connected]) {
-	[btMan setEnabled:0];
-	[btMan setPowered:0];
+	if (![btMan connected] && [btMan enabled]) {
+		[btMan setEnabled:0];
+		[btMan setPowered:0];
 	}
 }
 
