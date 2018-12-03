@@ -12,53 +12,65 @@
 static BOOL enabled;
 static BOOL useTimer;
 static float timer;
-static BOOL canDisable = YES;
+static BOOL canDisable;
 
 static void loadPrefs() {
     static NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.karimo299.autoblue"];
 		enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;
-		enabled = [prefs objectForKey:@"useTimer"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;    
+		useTimer = [prefs objectForKey:@"useTimer"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;    
 		timer = [prefs objectForKey:@"timer"] ? [[prefs objectForKey:@"timer"]floatValue] * 60 : 5 * 60;
 	  timer = 10.0;
 }
 
 %hook BluetoothManager
+NSTimer *tc;
 - (void)_connectedStatusChanged {
+	NSLog(@"%d", useTimer);
 	%orig;
 	if (enabled && ![self connected] && [self powered]) {
 		if (useTimer) {
-			if (canDisable) {
-			[self performSelector:@selector(disable) withObject:nil afterDelay:timer];
-			}
+			tc	= [NSTimer scheduledTimerWithTimeInterval:timer
+				target:self
+				selector:@selector(disable)
+				userInfo:nil
+				repeats:NO];
 		} else {
 			[self disable];
 		}
-	}
+	} else if ([self connected]) {
+	[tc invalidate];
+	}	
 }
 
+NSTimer *tp;
 	-(void)setPowered:(BOOL)arg1 {
 		%orig;
 		NSLog(@"%d, arg1 %d", [self powered], arg1);
 		if (enabled && ![self connected] && arg1) {
 				NSLog(@"setPowered");
-				dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timer * NSEC_PER_SEC));
-				dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-					if (![self connected]) {
-					%orig(NO);
-					}
-			});
+				%orig(YES);
+			tp	= [NSTimer scheduledTimerWithTimeInterval:timer
+				target:self
+				selector:@selector(disable)
+				userInfo:nil
+				repeats:NO];
+			if (canDisable) {
+				%orig(NO);
+			}
+		} else if (!arg1) {
+		[tp invalidate];
 		}
 	}
 
 	%new
 	- (void)disable {
-			if (![self connected] && [self powered]) {
-					canDisable = YES;
-					NSLog(@"disable");
-					[self setEnabled:NO];
-					[self setPowered:NO];
-					NSLog(@"%d", [self powered]);
-			}
+		if ((![self connected] && [self powered])) {
+			canDisable = YES;
+			NSLog(@"disable");
+			[self setEnabled:NO];
+			[self setPowered:NO];
+			canDisable = NO;
+		}
 	}
 	%end
 
