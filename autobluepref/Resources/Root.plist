@@ -44,13 +44,13 @@
 				<key>PostNotification</key>
 				<string>com.karimo299.autoblue/prefChanged</string>
 				<key>default</key>
-				<true/>
+				<false/>
 				<key>defaults</key>
 				<string>com.karimo299.autoblue</string>
 				<key>key</key>
-				<string>useTimer</string>
+				<string>rn</string>
 				<key>label</key>
-				<string>Use Timer</string>
+				<string>Immediately Disable Bluetooth</string>
 			</dict>
 			<dict>
 					<key>cellClass</key>

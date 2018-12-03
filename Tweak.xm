@@ -10,25 +10,23 @@
 @end
 
 static BOOL enabled;
-static BOOL useTimer;
+static BOOL rn;
 static float timer;
 static BOOL canDisable;
 
 static void loadPrefs() {
     static NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.karimo299.autoblue"];
 		enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;
-		useTimer = [prefs objectForKey:@"useTimer"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;    
+		rn = [prefs objectForKey:@"rn"] ? [[prefs objectForKey:@"rn"] boolValue] : NO;    
 		timer = [prefs objectForKey:@"timer"] ? [[prefs objectForKey:@"timer"]floatValue] * 60 : 5 * 60;
-	  timer = 10.0;
 }
 
 %hook BluetoothManager
 NSTimer *tc;
 - (void)_connectedStatusChanged {
-	NSLog(@"%d", useTimer);
 	%orig;
 	if (enabled && ![self connected] && [self powered]) {
-		if (useTimer) {
+		if (!rn) {
 			tc	= [NSTimer scheduledTimerWithTimeInterval:timer
 				target:self
 				selector:@selector(disable)
@@ -45,9 +43,7 @@ NSTimer *tc;
 NSTimer *tp;
 	-(void)setPowered:(BOOL)arg1 {
 		%orig;
-		NSLog(@"%d, arg1 %d", [self powered], arg1);
 		if (enabled && ![self connected] && arg1) {
-				NSLog(@"setPowered");
 				%orig(YES);
 			tp	= [NSTimer scheduledTimerWithTimeInterval:timer
 				target:self
@@ -66,7 +62,6 @@ NSTimer *tp;
 	- (void)disable {
 		if ((![self connected] && [self powered])) {
 			canDisable = YES;
-			NSLog(@"disable");
 			[self setEnabled:NO];
 			[self setPowered:NO];
 			canDisable = NO;
