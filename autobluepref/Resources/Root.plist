@@ -34,12 +34,6 @@
 			</dict>
 			<dict>
 				<key>cell</key>
-				<string>PSGroupCell</string>
-				<key>label</key>
-				<string>Extra</string>
-			</dict>
-			<dict>
-				<key>cell</key>
 				<string>PSSwitchCell</string>
 				<key>PostNotification</key>
 				<string>com.karimo299.autoblue/prefChanged</string>
@@ -62,7 +56,7 @@
 					<key>defaults</key>
 					<string>com.karimo299.autoblue</string>
 					<key>key</key>
-					<string>timer</string>
+					<string>timerTime</string>
 					<key>label</key>
 					<string>%i Minutes</string>
 					<key>max</key>
@@ -72,6 +66,40 @@
 					<key>singularLabel</key>
 					<string>A Minute</string>
 			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSGroupCell</string>
+				<key>label</key>
+				<string>Extra</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSSwitchCell</string>
+				<key>PostNotification</key>
+				<string>com.karimo299.autoblue/prefChanged</string>
+				<key>default</key>
+				<false/>
+				<key>defaults</key>
+				<string>com.karimo299.autoblue</string>
+				<key>key</key>
+				<string>charge</string>
+				<key>label</key>
+				<string>Enable Bluetooth when pluged</string>
+			</dict>
+			<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>PostNotification</key>
+			<string>com.karimo299.autoblue/prefChanged</string>
+			<key>defaults</key>
+			<string>com.karimo299.autoblue</string>
+			<key>label</key>
+			<string>Enable Bluetooth in:</string>
+			<key>DefaultValue</key>
+			<string>0 apps</string>
+			<key>action</key>
+			<string>selectApps</string>
+		</dict>
 			<dict>
 				<key>cell</key>
 				<string>PSButtonCell</string>

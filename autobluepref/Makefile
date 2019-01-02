@@ -5,6 +5,7 @@ AutoBluePref_FILES = ABTRootListController.m
 AutoBluePref_INSTALL_PATH = /Library/PreferenceBundles
 AutoBluePref_FRAMEWORKS = UIKit
 AutoBluePref_EXTRA_FRAMEWORKS += CepheiPrefs
+AutoBluePref_LIBRARIES = sparkapplist
 AutoBluePref_PRIVATE_FRAMEWORKS = Preferences
 
 include $(THEOS_MAKE_PATH)/bundle.mk

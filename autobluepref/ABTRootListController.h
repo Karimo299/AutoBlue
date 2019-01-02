@@ -8,4 +8,5 @@
 - (void) tweet;
 - (void) tweetPin;
 - (void) respring;
+- (void)selectApps;
 @end
