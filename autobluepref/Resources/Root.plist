@@ -34,6 +34,14 @@
 			</dict>
 			<dict>
 				<key>cell</key>
+				<string>PSGroupCell</string>
+				<key>label</key>
+				<string>Bluetooth</string>
+				<key>footerText</key>
+				<string>You can set the timer to 0 to disabled Bluetooth immediately after disconnecting a Bluetooth device</string>
+			</dict>
+			<dict>
+				<key>cell</key>
 				<string>PSSwitchCell</string>
 				<key>PostNotification</key>
 				<string>com.karimo299.autoblue/prefChanged</string>
@@ -42,35 +50,29 @@
 				<key>defaults</key>
 				<string>com.karimo299.autoblue</string>
 				<key>key</key>
-				<string>rn</string>
+				<string>BTEnabled</string>
 				<key>label</key>
-				<string>Immediately Disable Bluetooth</string>
+				<string>Enable Bluetooth timer</string>
 			</dict>
 			<dict>
-					<key>cellClass</key>
-					<string>HBStepperTableCell</string>
-					<key>PostNotification</key>
-					<string>com.karimo299.autoblue/prefChanged</string>
-					<key>default</key>
-					<real>5</real>
-					<key>defaults</key>
-					<string>com.karimo299.autoblue</string>
-					<key>key</key>
-					<string>timerTime</string>
-					<key>label</key>
-					<string>%i Minutes</string>
-					<key>max</key>
-					<real>60</real>
-					<key>min</key>
-					<real>1</real>
-					<key>singularLabel</key>
-					<string>A Minute</string>
-			</dict>
-			<dict>
-				<key>cell</key>
-				<string>PSGroupCell</string>
+				<key>cellClass</key>
+				<string>HBStepperTableCell</string>
+				<key>PostNotification</key>
+				<string>com.karimo299.autoblue/prefChanged</string>
+				<key>default</key>
+				<real>5</real>
+				<key>defaults</key>
+				<string>com.karimo299.autoblue</string>
+				<key>key</key>
+				<string>BTTimerTime</string>
 				<key>label</key>
-				<string>Extra</string>
+				<string>%i Minutes</string>
+				<key>max</key>
+				<real>60</real>
+				<key>min</key>
+				<real>0</real>
+				<key>singularLabel</key>
+				<string>A Minute</string>
 			</dict>
 			<dict>
 				<key>cell</key>
@@ -84,22 +86,98 @@
 				<key>key</key>
 				<string>charge</string>
 				<key>label</key>
-				<string>Enable Bluetooth when pluged</string>
+				<string>Enable Bluetooth when plugged</string>
 			</dict>
 			<dict>
+			<key>bundle</key>
+			<string>AppList</string>
+			<key>ALNavigationTitle</key>
+			<string>Enable Bluetooth in:</string>
+			<key>enabled</key>
+			<true/>
 			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>PostNotification</key>
-			<string>com.karimo299.autoblue/prefChanged</string>
-			<key>defaults</key>
-			<string>com.karimo299.autoblue</string>
+			<string>PSLinkCell</string>
+			<key>isController</key>
+			<true/>
 			<key>label</key>
 			<string>Enable Bluetooth in:</string>
-			<key>DefaultValue</key>
-			<string>0 apps</string>
-			<key>action</key>
-			<string>selectApps</string>
+			<key>ALSettingsPath</key>
+			<string>/var/mobile/Library/Preferences/com.karimo299.autoblue.plist</string>
+			<key>ALSettingsKeyPrefix</key>
+			<string>selectApps-</string>
+			<key>PostNotification</key>
+			<string>com.karimo299.autoblue/prefChanged</string>
 		</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSGroupCell</string>
+				<key>label</key>
+				<string>WiFi</string>
+				<key>footerText</key>
+				<string>Allow Cellular Changes, allows Cellular to be enabled/disabled when WiFi is enabled/disabled</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSSwitchCell</string>
+				<key>PostNotification</key>
+				<string>com.karimo299.autoblue/prefChanged</string>
+				<key>default</key>
+				<false/>
+				<key>defaults</key>
+				<string>com.karimo299.autoblue</string>
+				<key>key</key>
+				<string>wifiEnabled</string>
+				<key>label</key>
+				<string>Enable WiFi timer</string>
+			</dict>
+			<dict>
+				<key>cellClass</key>
+				<string>HBStepperTableCell</string>
+				<key>PostNotification</key>
+				<string>com.karimo299.autoblue/prefChanged</string>
+				<key>default</key>
+				<real>5</real>
+				<key>defaults</key>
+				<string>com.karimo299.autoblue</string>
+				<key>key</key>
+				<string>wifiTimerTime</string>
+				<key>label</key>
+				<string>%i Minutes</string>
+				<key>max</key>
+				<real>60</real>
+				<key>min</key>
+				<real>1</real>
+				<key>singularLabel</key>
+				<string>A Minute</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSSwitchCell</string>
+				<key>PostNotification</key>
+				<string>com.karimo299.autoblue/prefChanged</string>
+				<key>default</key>
+				<false/>
+				<key>defaults</key>
+				<string>com.karimo299.autoblue</string>
+				<key>key</key>
+				<string>turnCell</string>
+				<key>label</key>
+				<string>Allow cellular changes</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSGroupCell</string>
+				<key>label</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSButtonCell</string>
+				<key>label</key>
+				<string>Reset All Settings to Defualt</string>
+				<key>action</key>
+				<string>reset</string>
+			</dict>
 			<dict>
 				<key>cell</key>
 				<string>PSButtonCell</string>
@@ -127,6 +205,16 @@
 				<string>Karimo299</string>
 				<key>action</key>
 				<string>tweet</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSButtonCell</string>
+				<key>icon</key>
+				<string>paypal.png</string>
+				<key>label</key>
+				<string>Support My Work</string>
+				<key>action</key>
+				<string>paypal</string>
 			</dict>
 			<dict>
 				<key>cell</key>

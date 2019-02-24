@@ -3,8 +3,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = AutoBlue
 AutoBlue_FILES = Tweak.xm
 AutoBlue_EXTRA_FRAMEWORKS += Cephei
-AutoBlue_CFLAGS += -fobjc-arc
-AutoBlue_LIBRARIES = sparkapplist
+AutoBlue_LIBRARIES = applist
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
