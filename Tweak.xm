@@ -1,74 +1,4 @@
-#import <PersistentConnection/PCSimpleTimer.h>
-
-@interface CCUILabeledRoundButton : UIView
-@property (nonatomic,copy) NSString * title;
-@property (nonatomic,copy) NSString * subtitle;
--(void)disableBT;
--(void)disableWifi;
-@end
-
-@interface PSCellularDataSettingsDetail : NSObject
-+(void)setEnabled:(BOOL)arg1;
-@end
-
-@interface PSAirplaneModeSettingsDetail : NSObject
-+(BOOL)isEnabled;
-@end
-
-@interface PSWiFiSettingsDetail : NSObject
-+(void)setEnabled:(BOOL)arg1;
-@end
-
-@interface BluetoothManager : NSObject
--(void)disableBT;
-+(id)sharedInstance;
--(bool)powered;
--(void)setPowered:(BOOL)arg1;
--(BOOL)connected;
-@end
-
-@interface SBWiFiManager : NSObject
-+(id)sharedInstance;
--(id)currentNetworkName;
--(void)disableWifi;
-@end
-
-@interface SBApplication : NSObject
--(NSString *)bundleIdentifier;
-@end
-
-@interface FBProcessState : NSObject
--(int)visibility;
-@end
-
-static NSUserDefaults *prefs;
-SBWiFiManager *wifiManager = [%c(SBWiFiManager) sharedInstance];
-BluetoothManager *BTManager = [%c(BluetoothManager) sharedInstance];
-
-static bool enabled;
-static bool BTEnabled;
-static bool wifiEnabled;
-static bool hotspot;
-static bool charge;
-static bool turnCell;
-static bool shouldEnable;
-static float wifiTimerTime;
-static float BTTimerTime;
-PCSimpleTimer *wifiPoweredTimer;
-PCSimpleTimer *BTPoweredTimer;
-CCUILabeledRoundButton *labeledBtns;
-
-static void loadPrefs() {
-  prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.karimo299.autoblue"];
-  enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;
-  BTEnabled = [prefs objectForKey:@"BTEnabled"] ? [[prefs objectForKey:@"BTEnabled"] boolValue] : NO;
-  wifiEnabled = [prefs objectForKey:@"wifiEnabled"] ? [[prefs objectForKey:@"wifiEnabled"] boolValue] : NO;
-  charge = [prefs objectForKey:@"charge"] ? [[prefs objectForKey:@"charge"] boolValue] : NO;
-  turnCell = [prefs objectForKey:@"turnCell"] ? [[prefs objectForKey:@"turnCell"] boolValue] : NO;
-  BTTimerTime = [prefs objectForKey:@"BTTimerTime"] ? [[prefs objectForKey:@"BTTimerTime"]floatValue] * 60 : 5 * 60;
-  wifiTimerTime = [prefs objectForKey:@"wifiTimerTime"] ? [[prefs objectForKey:@"wifiTimerTime"]floatValue] * 60 : 5 * 60;
-}
-
+#include "Headers.h"
 %group ios11
 %hook BluetoothManager
 -(id)init {
@@ -112,7 +42,11 @@ static void loadPrefs() {
 }
 
 - (BOOL)setPowered:(BOOL)arg1 {
-  return %orig(shouldEnable);
+  if ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/RealCC.dylib"]) {
+    return %orig(shouldEnable);
+  } else {
+    return %orig;
+  }
 }
 %end
 
@@ -120,7 +54,6 @@ static void loadPrefs() {
 %hook SBApplication
 -(void)_updateProcess:(id)arg1 withState:(FBProcessState *)state {
 	if ([state visibility] == 2 && enabled) {
-    NSLog(@"%d",[[prefs valueForKey:[NSString stringWithFormat:@"selectApps-%@", [self bundleIdentifier]]] boolValue] );
 		if ([[prefs valueForKey:[NSString stringWithFormat:@"selectApps-%@", [self bundleIdentifier]]] boolValue]) {
       shouldEnable = YES;
       [BTManager setPowered:YES];
@@ -209,127 +142,10 @@ static void loadPrefs() {
 %end
 %end
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-%group ios10
-
-%hook SBApplication
--(void)_updateProcess:(id)arg1 withState:(FBProcessState *)state {
-	if ([state visibility] == 2 && enabled) {
-		if ([[prefs valueForKey:[NSString stringWithFormat:@"selectApps-%@", [self bundleIdentifier]]] boolValue]) {
-      [BTManager setPowered:YES];
-    }
-	}
-	%orig;
-}
-%end
-
-//Bluetooth Button
-%hook CCUIBluetoothSetting
--(void)_setBluetoothEnabled:(BOOL)arg1 {
-  %orig;
-  [BTPoweredTimer invalidate];
-  if (arg1) {
-    if (BTEnabled) {
-      if (BTTimerTime != 0 && ![BTPoweredTimer isValid]) {
-        BTPoweredTimer = [[%c(PCSimpleTimer) alloc] initWithTimeInterval:BTTimerTime serviceIdentifier:@"com.karimo299.autoblue" target:BTManager selector:@selector(disableBT) userInfo:nil];
-        [BTPoweredTimer scheduleInRunLoop:[NSRunLoop mainRunLoop]];
-      }
-    }
-  }
-}
-%end
-
-//Wifi Button
-%hook CCUIWiFiSetting
--(void)_setWifiEnabled:(BOOL)arg1 {
-  %orig;
-  [wifiPoweredTimer invalidate];
-  if (arg1) {
-    if (wifiPoweredTimer) {
-        wifiPoweredTimer = [[%c(PCSimpleTimer) alloc] initWithTimeInterval:BTTimerTime serviceIdentifier:@"com.karimo299.autoblue" target:wifiManager selector:@selector(disableWifi) userInfo:nil];
-        [wifiPoweredTimer scheduleInRunLoop:[NSRunLoop mainRunLoop]];
-      }
-    }
-  if (turnCell && ![%c(PSAirplaneModeSettingsDetail) isEnabled]) {
-    [%c(PSCellularDataSettingsDetail) setEnabled:!arg1];
-  }
-}
-%end
-
-//Cellular Button
-%hook PSCellularDataSettingsDetail
-+(void)setEnabled:(BOOL)arg1 {
-  %orig;
-  if (turnCell && ![%c(PSAirplaneModeSettingsDetail) isEnabled]) {
-    [%c(PSWiFiSettingsDetail) setEnabled:!arg1];
-  }
-}
-%end
-
-
-//Bluetooth Manager
-%hook BluetoothManager
--(id)init {
-  if (enabled) {
-    [[UIDevice currentDevice] setBatteryMonitoringEnabled:YES];
-    [[NSNotificationCenter defaultCenter] addObserverForName:UIDeviceBatteryStateDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-      if (charge) {
-        if ([[UIDevice currentDevice] batteryState] == UIDeviceBatteryStateCharging) {
-          [BTManager setPowered:YES];
-          [BTPoweredTimer invalidate];
-        } else {
-          if (BTEnabled) {
-            if (BTTimerTime != 0 && ![BTPoweredTimer isValid]) {
-              BTPoweredTimer = [[%c(PCSimpleTimer) alloc] initWithTimeInterval:BTTimerTime serviceIdentifier:@"com.karimo299.autoblue" target:BTManager selector:@selector(disableBT) userInfo:nil];
-              [BTPoweredTimer scheduleInRunLoop:[NSRunLoop mainRunLoop]];
-            } else {
-              [BTManager disableBT];
-            }
-          }
-        }
-      }
-    }];
-  }
-  return %orig;
-}
-
-- (void)_connectedStatusChanged {
-	%orig;
-	if (enabled && ![self connected]) {
-    if (BTTimerTime == 0) {
-      [BTManager disableBT];
-    }
-	}
-}
-
-%new
-- (void)disableBT {
-  if(![BTManager connected] && !hotspot){
-    [BTManager setPowered:NO];
-  }
-}
-%end
-
-// Wifi Manager
-%hook SBWiFiManager
-%new
-- (void)disableWifi {
-  if(![wifiManager currentNetworkName] && !hotspot){
-    [%c(PSWiFiSettingsDetail) setEnabled: NO];
-  }
-}
-%end
-%end
-
-
 %ctor {
   float version = [[[UIDevice currentDevice] systemVersion] floatValue];
-loadPrefs();
   if (version >= 11) {
     %init(ios11);
-  } else if (version < 11 && version >= 10) {
-    %init(ios10);
   }
     CFNotificationCenterAddObserver(
 		CFNotificationCenterGetDarwinNotifyCenter(), NULL,
