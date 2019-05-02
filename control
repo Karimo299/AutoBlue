@@ -1,7 +1,7 @@
 Package: com.karimo299.autoblue
 Name: AutoBlue
-Depends: mobilesubstrate, preferenceloader, ws.hbang.common, appList
-Version: 2.1.1
+Depends: mobilesubstrate, preferenceloader, ws.hbang.common, applist
+Version: 2.2.0
 Architecture: iphoneos-arm
 Description: Disables Bluetooth and WiFi after a certain amount of time if there are not connected.
 Maintainer: Karimo299
